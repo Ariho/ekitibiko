@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EKITIBIKO - Live Sync</title>
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}body{margin:0;background:#f2f4f7}
+header{background:#0f3d2e;color:#fff;padding:14px;text-align:center}header h1{margin:0;font-size:20px}
+.login{max-width:400px;margin:24px auto;background:#fff;padding:22px;border-radius:14px}
+input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin:6px 0}
+.btn{background:#0f3d2e;color:#fff;border:0;padding:13px;border-radius:10px;width:100%;font-weight:bold;cursor:pointer;margin-top:8px}
+.btn2{background:#ff8a00}.btnWA{background:#25D366;color:#fff;border:0;padding:13px;border-radius:10px;width:100%;font-weight:bold;cursor:pointer;margin-top:8px}
+.nav{display:flex;gap:8px;padding:10px;overflow-x:auto;background:#fff;position:sticky;top:0}.nav button{white-space:nowrap;border:1px solid #0f3d2e;background:#fff;color:#0f3d2e;padding:10px 14px;border-radius:20px;font-weight:bold;cursor:pointer}.nav button.active{background:#0f3d2e;color:#fff}
+.wrap{padding:12px;max-width:1000px;margin:auto}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:#fff;border-radius:12px;padding:14px}.card small{color:#666}.card b{font-size:19px;display:block;margin-top:4px}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;margin-top:12px;font-size:13px}th{background:#0f3d2e;color:#fff;padding:10px;text-align:left}td{padding:10px;border-bottom:1px solid #eee}
+.badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold}.badge.clear{background:#d1fae5;color:#065f46}.badge.clearing{background:#fef3c7;color:#92400e}.hidden{display:none}.alert{background:#fff3cd;padding:12px;border-radius:10px;margin:10px 0;font-size:13px}.topbar{display:flex;justify-content:space-between;align-items:center;background:#e8f5e9;padding:8px 14px;font-size:13px}.mybox{background:#e8f5e9;border:2px solid #0f3d2e;border-radius:12px;padding:16px;margin:12px 0}.sync{font-size:12px;color:#0f9d63;font-weight:bold}
+</style>
+</head>
+<body>
+<div id="loginScreen" class="login">
+<h2 style="text-align:center;margin:0">EKITIBIKO - LIVE SYNC ☁️</h2><p style="text-align:center;color:#666;font-size:13px">Chairman: Jovlet • Treasurer: Kato • Secretary: Jason<br><span class="sync" id="syncStatus">● Connecting to Firebase...</span></p>
+<label>Login As</label><select id="loginType" onchange="toggleMemberSelect()"><option value="admin">Admin - Jason / Jovlet / Kato</option><option value="member">Member - Own Balance Only</option></select>
+<div id="adminBox"><label>Admin User</label><select id="loginUser"><option value="jason">Jason - Superadmin</option><option value="jovlet">Jovlet - Chairman</option><option value="kato">Kato - Treasurer</option></select></div>
+<div id="memberBox" class="hidden"><label>Select Your Name</label><select id="loginMember"></select></div>
+<label>PIN</label><input id="loginPin" type="password" inputmode="numeric" placeholder="Enter PIN" maxlength="4">
+<button class="btn" onclick="doLogin()">Login →</button><p id="loginMsg" style="color:red;font-size:13px"></p>
+<div style="background:#f8f9fa;padding:10px;border-radius:8px;font-size:12px"><b>Admin PINs:</b> Jason 1111 • Jovlet 2222 • Kato 3333<br><b>Member PINs:</b> 5001-5017</div>
+</div>
+
+<div id="app" class="hidden">
+<header><h1>EKITIBIKO GROUP - LIVE</h1><p>Interest = 5% x Remaining • Sub 5,000 • Loan at 50%</p></header>
+<div class="topbar"><span id="whoIs"></span><span class="sync">● LIVE SYNC ON</span><button onclick="logout()" style="border:0;background:#c62828;color:#fff;padding:6px 12px;border-radius:20px;font-weight:bold;cursor:pointer">Logout</button></div>
+<div class="nav"><button onclick="show('dash')" id="b-dash" class="active">Dashboard</button><button onclick="show('members')" id="b-members">Members</button><button onclick="show('collect')" id="b-collect">Collect on 5th</button><button onclick="show('loans')" id="b-loans">Loans</button><button onclick="show('report')" id="b-report">Report</button><button onclick="show('settings')" id="b-settings">Settings / PINs</button></div>
+<div class="wrap">
+<div id="dash"><div id="memberOnlyBox" class="hidden"></div><div id="adminDash"><div class="cards"><div class="card"><small>Principal Cleared</small><b id="tPrincipal"></b></div><div class="card"><small>Interest Collected</small><b id="tInterest"></b></div><div class="card"><small>Subscription</small><b id="tSub"></b></div><div class="card"><small>Total Cash with Kato</small><b id="tCash"></b></div></div><div class="cards" style="margin-top:10px"><div class="card"><small>Remaining to Clear</small><b id="tRemain"></b></div><div class="card"><small>Interest Due 5th Dec</small><b id="tNextInt"></b></div></div><div class="alert">📅 <b>Next: 5th Dec</b> - Live data. If Kato records now, you see it now.</div><button class="btnWA" onclick="shareWhatsApp('dashboard')">📲 Share Dashboard to WhatsApp</button><div id="dashList"></div></div></div>
+<div id="members" class="hidden"><h3>Members - Live</h3><div id="memberTable"></div><button id="addBtn" class="btn btn2" onclick="addMember()">+ Add Member - Jason Only</button></div>
+<div id="collect" class="hidden"><h3>Record Payment - 5th Dec</h3><label>Member</label><select id="selMember"></select><label>Principal Paid</label><input id="inpPrincipal" type="number" placeholder="e.g. 50000"><label>Interest Paid (auto)</label><input id="inpInterest" type="number" readonly><label>Subscription</label><input id="inpSub" type="number" value="5000"><label>Penalty</label><input id="inpPenalty" type="number" value="0"><button class="btn" onclick="recordPayment()">✅ Record Payment & Sync to All</button><p id="collectMsg"></p><h4>Expected 5th Dec</h4><div id="expectedTable"></div><button class="btnWA" onclick="shareWhatsApp('expected')">📲 Share 5th Dec Sheet to WhatsApp</button></div>
+<div id="loans" class="hidden"><h3>Loan Eligibility - 50% Rule</h3><div id="loanTable"></div><div id="loanForm"><h4>Give Loan</h4><label>Member</label><select id="loanMember"></select><label>Amount</label><input id="loanAmt" type="number"><label>Level</label><select id="loanLevel"><option value="1">1x</option><option value="1.5">1.5x</option><option value="2">2x</option></select><button class="btn" onclick="giveLoan()">Give Loan & Sync</button><p id="loanMsg"></p></div></div>
+<div id="report" class="hidden"><h3>Report - 5th Nov</h3><table><tr><th>Pot</th><th>Amount</th></tr><tr><td>Principal</td><td>UGX 200,000</td></tr><tr><td>Interest</td><td>UGX 242,500</td></tr><tr><td>Subscription</td><td>UGX 85,000</td></tr><tr><td>Penalty</td><td>UGX 0</td></tr><tr><td><b>Total Cash</b></td><td><b>UGX 527,500</b></td></tr></table><button class="btnWA" onclick="shareWhatsApp('report')">📲 Share Report to WhatsApp</button></div>
+<div id="settings" class="hidden"><h3>Settings - Jason Only</h3><label>Jason PIN</label><input id="pinJason" value="1111"><label>Jovlet PIN</label><input id="pinJovlet" value="2222"><label>Kato PIN</label><input id="pinKato" value="3333"><div id="memberPins"></div><button class="btn" onclick="savePins()">Save New PINs & Sync</button><p id="pinMsg"></p><button class="btn btn2" onclick="seedData()">⚠️ First Time Only: Load 5th Nov Data to Firebase</button></div>
+</div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// YOUR FIREBASE CONFIG - ALREADY INSERTED
+const firebaseConfig = {
+  apiKey: "AIzaSyCeNE0Y3idyc4wdI9WeUqgpJopaqlnvtgU",
+  authDomain: "ekitibiko.firebaseapp.com",
+  databaseURL: "https://ekitibiko-default-rtdb.firebaseio.com",
+  projectId: "ekitibiko",
+  storageBucket: "ekitibiko.firebasestorage.app",
+  messagingSenderId: "465514528642",
+  appId: "1:465514528642:web:ad6ca555b7504822e5199b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const dataRef = ref(db, "ekitibiko/data");
+
+let USERS={jason:{pin:"1111",role:"Superadmin",name:"Jason"},jovlet:{pin:"2222",role:"Chairman",name:"Jovlet"},kato:{pin:"3333",role:"Treasurer",name:"Kato Alex"}};
+let members=[]; let totals={principal:200000,interest:242500,sub:85000,penalty:0}; let loans=[];
+let current=null, currentMemberIdx=-1, currentIsMember=false;
+
+function fmt(n){return "UGX "+n.toLocaleString()}
+function rem(m){return m.reserved-m.cleared}
+function intDue(m){return Math.round(rem(m)*0.05)}
+
+// LIVE SYNC - Realtime Database
+onValue(dataRef, (snap)=>{
+  let d=snap.val();
+  if(d){
+    members=d.members||[]; totals=d.totals||totals; loans=d.loans||[]; USERS=d.users||USERS;
+    document.getElementById('syncStatus').innerText="● LIVE SYNC ON - Connected to ekitibiko DB";
+    document.getElementById('syncStatus').style.color="#0f9d63";
+    document.getElementById('loginMember').innerHTML=members.map((m,i)=>`<option value="${i}">${m.name}</option>`).join('');
+    document.getElementById('memberPins').innerHTML=members.map((m,i)=>`<label>${m.name} PIN</label><input id="mpin-${i}" value="${m.pin}">`).join('');
+    if(current) render();
+  } else {
+    document.getElementById('syncStatus').innerText="● Not seeded yet - Login as Jason & click Seed in Settings";
+    document.getElementById('syncStatus').style.color="#c62828";
+  }
+});
+
+async function saveToFirebase(){ await set(dataRef, {members, totals, loans, users:USERS}); }
+window.saveToFirebase=saveToFirebase;
+
+window.seedData=async()=>{
+  if(current!=='jason'){alert('Only Jason can seed');return;}
+  members=[
+    {name:"Jovlet",reserved:500000,cleared:0,pin:"5001"},{name:"Jason",reserved:250000,cleared:0,pin:"5002"},{name:"Kato Alex",reserved:200000,cleared:50000,pin:"5003"},{name:"Yoram N (Kabay)",reserved:100000,cleared:0,pin:"5004"},{name:"Azan",reserved:100000,cleared:0,pin:"5005"},{name:"Ziporah",reserved:200000,cleared:50000,pin:"5006"},{name:"Beneth",reserved:1000000,cleared:0,pin:"5007"},{name:"Irene",reserved:150000,cleared:0,pin:"5008"},{name:"Sharon",reserved:100000,cleared:0,pin:"5009"},{name:"Mulenboyi",reserved:50000,cleared:0,pin:"5010"},{name:"Moreen",reserved:250000,cleared:0,pin:"5011"},{name:"Sarah",reserved:400000,cleared:0,pin:"5012"},{name:"Mary",reserved:500000,cleared:0,pin:"5013"},{name:"Nancy",reserved:500000,cleared:0,pin:"5014"},{name:"Oliva",reserved:200000,cleared:0,pin:"5015"},{name:"Jaston",reserved:100000,cleared:0,pin:"5016"},{name:"Naume (Mrs Pius)",reserved:250000,cleared:100000,pin:"5017"}];
+  totals={principal:200000,interest:242500,sub:85000,penalty:0}; loans=[];
+  await saveToFirebase(); alert('✅ Seeded! Now everyone sees same data.');
+};
+window.toggleMemberSelect=()=>{let t=document.getElementById('loginType').value; document.getElementById('adminBox').classList.toggle('hidden',t==='member'); document.getElementById('memberBox').classList.toggle('hidden',t!=='member');};
+window.doLogin=()=>{
+  let type=document.getElementById('loginType').value, pin=document.getElementById('loginPin').value;
+  if(type==='admin'){let u=document.getElementById('loginUser').value; if(USERS[u].pin!==pin){document.getElementById('loginMsg').innerText="❌ Wrong PIN";return;} current=u; currentIsMember=false; currentMemberIdx=-1; document.getElementById('whoIs').innerHTML=`Logged in as: <b>${USERS[u].name} (${USERS[u].role})</b>`;}
+  else{let idx=parseInt(document.getElementById('loginMember').value); if(!members[idx]||members[idx].pin!==pin){document.getElementById('loginMsg').innerText="❌ Wrong PIN";return;} current='member'; currentIsMember=true; currentMemberIdx=idx; document.getElementById('whoIs').innerHTML=`Logged in as: <b>${members[idx].name} (Member)</b>`;}
+  document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); applyPermissions(); render(); show('dash');
+};
+window.logout=()=>{current=null;currentMemberIdx=-1;currentIsMember=false;document.getElementById('loginPin').value='';document.getElementById('app').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');};
+function applyPermissions(){let isJason=current==='jason', isMember=currentIsMember; document.getElementById('b-collect').style.display=isMember?'none':'block'; document.getElementById('b-settings').style.display=isJason?'block':'none'; document.getElementById('addBtn').style.display=isJason?'block':'none'; document.getElementById('loanForm').style.display=(current==='jason'||current==='jovlet')?'block':'none'; document.getElementById('adminDash').style.display=isMember?'none':'block'; document.getElementById('memberOnlyBox').classList.toggle('hidden',!isMember); if(isMember){let m=members[currentMemberIdx]; let pct=Math.round(m.cleared/m.reserved*100); document.getElementById('memberOnlyBox').innerHTML=`<div class="mybox"><h3 style="margin:0">Hello ${m.name} 👋</h3><table><tr><td>Reserved</td><td><b>${fmt(m.reserved)}</b></td></tr><tr><td>Cleared</td><td><b>${fmt(m.cleared)}</b></td></tr><tr><td>Remaining</td><td><b>${fmt(rem(m))}</b></td></tr><tr><td>Interest Due 5th Dec</td><td><b>${fmt(intDue(m))}</b></td></tr><tr><td>Total Due 5th Dec</td><td><b>${fmt(intDue(m)+5000)}</b></td></tr><tr><td>Loan?</td><td><b>${m.cleared>=m.reserved*0.5?'✅ YES':'❌ Need '+fmt(m.reserved*0.5-m.cleared)}</b></td></tr></table><button class="btnWA" onclick="shareWhatsApp('my')">📲 Share My Statement</button></div>`;}}
+window.render=()=>{
+  let totP=0,totR=0,totInt=0; members.forEach(m=>{totP+=m.cleared;totR+=rem(m);totInt+=intDue(m)});
+  document.getElementById('tPrincipal').innerText=fmt(totP); document.getElementById('tRemain').innerText=fmt(totR); document.getElementById('tNextInt').innerText=fmt(totInt); document.getElementById('tInterest').innerText=fmt(totals.interest); document.getElementById('tSub').innerText=fmt(totals.sub); document.getElementById('tCash').innerText=fmt(totals.principal+totals.interest+totals.sub+totals.penalty);
+  let list=currentIsMember?[members[currentMemberIdx]]:members; let h=`<table><tr><th>Member</th><th>Reserved</th><th>Cleared</th><th>Remaining</th><th>Interest Due</th><th>Status</th></tr>`; list.forEach(m=>{let pct=Math.round(m.cleared/m.reserved*100); h+=`<tr><td><b>${m.name}</b><br><small>${pct}%</small></td><td>${fmt(m.reserved)}</td><td>${fmt(m.cleared)}</td><td>${fmt(rem(m))}</td><td><b>${fmt(intDue(m))}</b></td><td><span class="badge ${rem(m)===0?'clear':'clearing'}">${rem(m)===0?'FULLY CLEARED':'Clearing'}</span></td></tr>`}); h+=`</table>`; document.getElementById('memberTable').innerHTML=h; if(!currentIsMember) document.getElementById('dashList').innerHTML=h;
+  let opts=members.map((m,i)=>`<option value="${i}">${m.name} - Rem ${fmt(rem(m))} - Int ${fmt(intDue(m))}</option>`).join(''); document.getElementById('selMember').innerHTML=opts; document.getElementById('loanMember').innerHTML=opts; updateCollectForm();
+  let e=`<table><tr><th>Member</th><th>Interest</th><th>Sub</th><th>Total Due</th></tr>`; members.forEach(m=>{e+=`<tr><td>${m.name}</td><td>${fmt(intDue(m))}</td><td>5,000</td><td><b>${fmt(intDue(m)+5000)}</b></td></tr>`}); e+=`</table>`; document.getElementById('expectedTable').innerHTML=e;
+  let l=`<table><tr><th>Member</th><th>Cleared</th><th>50% Target</th><th>Eligible?</th><th>Limit 1x</th><th>Limit 2x</th></tr>`; members.forEach(m=>{let need=m.reserved*0.5; l+=`<tr><td>${m.name}</td><td>${fmt(m.cleared)}</td><td>${fmt(need)}</td><td>${m.cleared>=need?'✅ YES':'❌ Need '+fmt(need-m.cleared)}</td><td>${fmt(m.cleared)}</td><td>${fmt(m.cleared*2)}</td></tr>`}); l+=`</table>`; if(loans.length) l+=`<h4>Active Loans</h4><table><tr><th>Member</th><th>Amount</th><th>Level</th></tr>${loans.map(x=>`<tr><td>${x.name}</td><td>${fmt(x.amt)}</td><td>${x.level}x</td></tr>`).join('')}</table>`; document.getElementById('loanTable').innerHTML=l; applyPermissions();
+};
+function updateCollectForm(){let i=document.getElementById('selMember').value||0; let m=members[i]; if(!m) return; document.getElementById('inpInterest').value=intDue(m); document.getElementById('collectMsg').innerHTML=`${m.name}: Remaining <b>${fmt(rem(m))}</b> | Interest Due <b>${fmt(intDue(m))}</b>`;}
+document.getElementById('selMember')?.addEventListener('change',updateCollectForm);
+window.recordPayment=async()=>{let i=document.getElementById('selMember').value; let m=members[i]; let p=parseInt(document.getElementById('inpPrincipal').value||0); let intr=parseInt(document.getElementById('inpInterest').value||0); let sub=parseInt(document.getElementById('inpSub').value||0); let pen=parseInt(document.getElementById('inpPenalty').value||0); if(p>rem(m)){alert('Too much! Remaining '+fmt(rem(m)));return;} m.cleared+=p; totals.principal+=p; totals.interest+=intr; totals.sub+=sub; totals.penalty+=pen; await saveToFirebase(); document.getElementById('collectMsg').innerHTML=`✅ Synced! ${m.name}: Principal ${fmt(p)} + Interest ${fmt(intr)} + Sub ${fmt(sub)}. Everyone sees new balance now.`; document.getElementById('inpPrincipal').value='';};
+window.giveLoan=async()=>{let i=document.getElementById('loanMember').value; let m=members[i]; let amt=parseInt(document.getElementById('loanAmt').value||0); let lvl=parseFloat(document.getElementById('loanLevel').value); if(m.cleared<m.reserved*0.5){document.getElementById('loanMsg').innerText=`❌ Not eligible. Needs ${fmt(m.reserved*0.5-m.cleared)} more.`;return;} if(amt>m.cleared*lvl){document.getElementById('loanMsg').innerText=`❌ Limit ${fmt(m.cleared*lvl)}`;return;} loans.push({name:m.name,amt,level:lvl}); await saveToFirebase(); document.getElementById('loanMsg').innerText=`✅ Loan ${fmt(amt)} to ${m.name} - Synced to all`;};
+window.addMember=async()=>{let n=prompt('Name:'); if(!n)return; let s=parseInt(prompt('Shares? 1=50,000')); if(!s)return; let pin=prompt('Member PIN for '+n); members.push({name:n,reserved:s*50000,cleared:0,pin:pin||"0000"}); await saveToFirebase(); alert('Added '+n+' - Synced');};
+window.savePins=async()=>{USERS.jason.pin=document.getElementById('pinJason').value; USERS.jovlet.pin=document.getElementById('pinJovlet').value; USERS.kato.pin=document.getElementById('pinKato').value; members.forEach((m,i)=>{m.pin=document.getElementById('mpin-'+i).value}); await saveToFirebase(); document.getElementById('pinMsg').innerText='✅ PINs saved & synced.';};
+window.show=(id)=>{['dash','members','collect','loans','report','settings'].forEach(x=>{document.getElementById(x).classList.toggle('hidden',x!==id); document.getElementById('b-'+x).classList.toggle('active',x===id);});};
+window.shareWhatsApp=(type)=>{let text=""; if(type==='dashboard'){text=`*EKITIBIKO - LIVE DASHBOARD*\nPrincipal: ${totals.principal.toLocaleString()}\nInterest: ${totals.interest.toLocaleString()}\nSub: ${totals.sub.toLocaleString()}\nTotal Cash: ${(totals.principal+totals.interest+totals.sub).toLocaleString()}\nRemaining: ${members.reduce((a,m)=>a+rem(m),0).toLocaleString()}\nInterest Due 5th Dec: ${members.reduce((a,m)=>a+intDue(m),0).toLocaleString()}`;} if(type==='expected'){text=`*EKITIBIKO - DUE 5th Dec*\n`+members.map(m=>`${m.name}: Int ${intDue(m).toLocaleString()} + Sub 5,000 = ${(intDue(m)+5000).toLocaleString()}`).join('\n');} if(type==='report'){text=`*EKITIBIKO 5th Nov REPORT*\nPrincipal 200,000 | Interest 242,500 | Sub 85,000 | Total 527,500`;} if(type==='my'){let m=members[currentMemberIdx]; text=`Hello, this is ${m.name}. My Statement: Reserved ${m.reserved.toLocaleString()}, Cleared ${m.cleared.toLocaleString()}, Remaining ${rem(m).toLocaleString()}, Due 5th Dec ${(intDue(m)+5000).toLocaleString()}`;} window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");};
+</script>
+</body>
+</html>
