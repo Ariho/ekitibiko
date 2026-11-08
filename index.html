@@ -22,9 +22,9 @@ table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;ove
 <label>Login As</label><select id="loginType" onchange="toggleMemberSelect()"><option value="admin">Admin - Jason / Jovlet / Kato</option><option value="member">Member - Own Balance Only</option></select>
 <div id="adminBox"><label>Admin User</label><select id="loginUser"><option value="jason">Jason - Superadmin</option><option value="jovlet">Jovlet - Chairman</option><option value="kato">Kato - Treasurer</option></select></div>
 <div id="memberBox" class="hidden"><label>Select Your Name</label><select id="loginMember"></select></div>
-<label>PIN</label><input id="loginPin" type="password" inputmode="numeric" placeholder="Enter PIN" maxlength="4">
+<label>PIN</label><input id="loginPin" type="password" inputmode="text" placeholder="Enter PIN" maxlength="20">
 <button class="btn" onclick="doLogin()">Login →</button><p id="loginMsg" style="color:red;font-size:13px"></p>
-<div style="background:#f8f9fa;padding:10px;border-radius:8px;font-size:12px"><b>Admin PINs:</b> Jason 1111 • Jovlet 2222 • Kato 3333<br><b>Member PINs:</b> 5001-5017</div>
+<div style="background:#f8f9fa;padding:10px;border-radius:8px;font-size:12px"><b>Admin PINs:</b> Jason • Jovlet • Kato <br><b>Member PINs:</b> Personal</div>
 </div>
 
 <div id="app" class="hidden">
