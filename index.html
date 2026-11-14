@@ -23,15 +23,15 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#0f3d2e;color:#fff;text
 <div id="loginScreen" class="login">
 <h2 style="text-align:center;margin:0">EKITIBIKO SAVINGS GROUP</h2><p style="text-align:center;color:#666;font-size:13px">Chairman: Jovlet • Treasurer: Kato • Secretary: Jason<br>Committee: Jovlet, Jason, Kato, Asan, Yoram, Irene<br>Admins: Jason, Jovlet, Kato, Irene, Yoram, Asan<br>Loans: 2 Signatories Must Accept + 6/6 Committee<br><span class="sync" id="syncStatus">Connecting...</span><br><span id="debugMsg" style="font-size:11px;color:#c62828"></span></p>
 <label>Login As</label><select id="loginType" onchange="toggleMemberSelect()"><option value="admin">Admin - Jason / Jovlet / Kato / Irene / Yoram / Asan</option><option value="member">Member / Committee - Own Balance + Vote</option></select>
-<div id="adminBox"><label>Admin User</label><select id="loginUser"><option value="jason">Jason - Superadmin</option><option value="jovlet">Jovlet - Chairman</option><option value="kato">Kato - Treasurer</option></select></div>
+<div id="adminBox"><label>Admin User</label><select id="loginUser"><option value="jason">Jason - Superadmin</option><option value="jovlet">Jovlet - Chairman</option><option value="kato">Kato - Treasurer</option><option value="extra:Irene">Irene - Admin (Promoted)</option><option value="extra:Yoram N (Kabig)">Yoram N (Kabig) - Admin (Promoted)</option><option value="extra:Asan">Asan - Admin (Promoted)</option></select></div>
 <div id="memberBox" class="hidden"><label>Select Your Name</label><select id="loginMember"></select></div>
 <label>Password</label><input id="loginPin" type="text" placeholder="Enter Password" maxlength="20" style="font-size:16px">
 <button class="btn" onclick="doLogin()">Login</button><p id="loginMsg" style="color:red;font-size:13px"></p>
-<div style="background:#f3e8ff;padding:10px;border-radius:8px;font-size:12px"><b>New:</b> Add Shares to Existing Member - Jason only. Admins: Irene, Yoram, Asan now have full admin.</div>
+<div style="background:#f3e8ff;padding:10px;border-radius:8px;font-size:12px"><b>Admins Active:</b> Jason, Jovlet, Kato, Irene, Yoram, Asan - All see full admin. Jason only can change Admins.</div>
 </div>
 <div id="app" class="hidden">
 <header><h1>EKITIBIKO SAVINGS GROUP</h1><p>Shares Interest 5% • Loan Interest 5% • Sub 5,000 • 1 Share = 50,000 • Loans = 2 Signatories Accept + 6/6 Committee</p></header>
-<div class="topbar"><span id="whoIs"></span><span class="sync">LIVE SYNC ON</span><button onclick="logout()" style="border:0;background:#c62828;color:#fff;padding:6px 12px;border-radius:20px;font-weight:bold;cursor:pointer">Logout</button></div>
+<div class="topbar"><span id="whoIs"></span><span class="sync" id="topSync">LIVE SYNC ON</span><button onclick="logout()" style="border:0;background:#c62828;color:#fff;padding:6px 12px;border-radius:20px;font-weight:bold;cursor:pointer">Logout</button></div>
 <div class="nav"><button onclick="show('dash')" id="b-dash" class="active">Dashboard</button><button onclick="show('members')" id="b-members">Members</button><button onclick="show('collect')" id="b-collect">Collect on 5th</button><button onclick="show('loans')" id="b-loans">Loans - Committee</button><button onclick="show('report')" id="b-report">Report - 5th Nov</button><button onclick="show('expenses')" id="b-expenses">Expenses History</button><button onclick="show('settings')" id="b-settings">Settings / Passwords</button></div>
 <div class="wrap">
 <div id="dash"><div id="borrowerAlert" class="hidden"></div><div id="signatoryInbox" class="hidden"></div><div id="memberOnlyBox" class="hidden"></div><div id="memberTotalsBox" class="hidden"></div><div id="adminDash"><div class="cards"><div class="card"><small>Total Collected 5 Nov</small><b id="tCash"></b></div><div class="card"><small>Loans Given Out</small><b id="tLoansOut" style="color:#c62828"></b></div><div class="card"><small>Expenses Total</small><b id="tExpenses" style="color:#c62828"></b></div><div class="card"><small>Cash Remaining with Kato</small><b id="tCashLeft" style="color:#0f3d2e"></b></div></div><div class="cards" style="margin-top:10px"><div class="card"><small>Shares Interest Due 5th Dec</small><b id="tNextInt"></b></div><div class="card"><small>Loan Interest Due 5th Dec</small><b id="tLoanInt"></b></div><div class="card"><small>Total Due 5th Dec (All)</small><b id="tTotalDue"></b></div><div class="card"><small>Remaining Shares to Clear</small><b id="tRemain"></b></div><div class="card"><small>Total Reserved Shares (All Members)</small><b id="tTotalReserved"></b></div><div class="card"><small>Total Cleared Shares</small><b id="tTotalCleared"></b></div></div><div class="alert"><b>Admin View:</b> You see ALL figures, ALL members, ALL expenses, ALL signatories.</div><button class="btnWA" onclick="shareWhatsApp('dashboard')">Share Dashboard</button><div id="dashList"></div></div></div>
@@ -64,7 +64,7 @@ let NAME_FIX={"Yoram N (Kabay)":"Yoram N (Kabig)","Azan":"Asan","Mulenboyi":"Mut
 function fixName(n){ return NAME_FIX[n]||n; }
 function committeeKeyForMemberName(name){ name=fixName(name); if(name==="Jovlet") return "jovlet"; if(name==="Jason") return "jason"; if(name==="Kato Alex") return "kato"; if(name==="Asan") return "asan"; if(name==="Yoram N (Kabig)") return "yoram"; if(name==="Irene") return "irene"; return null; }
 function isCommitteeMember(name){ return COMMITTEE_NAMES.includes(fixName(name)); }
-// NEW: Extra Admins - promoted members with full admin rights
+// Extra Admins - promoted members with full admin rights - DEFAULT ACTIVE
 let extraAdmins=["Irene","Yoram N (Kabig)","Asan"];
 function isExtraAdmin(name){ return extraAdmins.some(n=>fixName(n)===fixName(name)); }
 function isAdminName(n){ return ["Jovlet","Jason","Kato Alex"].includes(fixName(n)) || isExtraAdmin(n); }
@@ -73,7 +73,23 @@ function getAdminLoginOptions(){
   extraAdmins.forEach(n=>{ html+=`<option value="extra:${n}">${n} - Admin (Promoted)</option>`; });
   return html;
 }
-function myCommitteeKey(){ if(!currentIsMember) return current; if(currentIsMember){ let m=members[currentMemberIdx]; return committeeKeyForMemberName(m.name); } return null; }
+function refreshAdminMenu(){
+  let el=document.getElementById('loginUser');
+  if(!el) return;
+  let prev=el.value;
+  el.innerHTML=getAdminLoginOptions();
+  if(prev) el.value=prev;
+}
+// Build menu immediately, before Firebase loads - so Irene/Yoram/Asan are always visible
+refreshAdminMenu();
+function myCommitteeKey(){
+  if(!currentIsMember){
+    if(current && current.startsWith('extra:')) return committeeKeyForMemberName(current.replace('extra:',''));
+    return current;
+  }
+  if(currentIsMember){ let m=members[currentMemberIdx]; return committeeKeyForMemberName(m.name); }
+  return null;
+}
 function isCurrentCommittee(){ let k=myCommitteeKey(); return k && COMMITTEE_KEYS[k]; }
 let members=[]; let totals={principal:200000,interest:242500,sub:85000,penalty:0}; let loans=[]; let expenses=[]; let loanRequests=[]; let sharesHistory=[];
 let current=null, currentMemberIdx=-1, currentIsMember=false; let currentAdminDisplay="";
@@ -84,4 +100,346 @@ function sharesCount(m){return Math.round(m.reserved/50000)}
 function loanFor(name){ name=fixName(name); return loans.filter(l=>fixName(l.name)===name && l.status!=="Defaulted"); }
 function loanAmtFor(name){return loanFor(name).reduce((a,l)=>a+parseInt(l.amt),0)}
 function loanIntFor(name){return Math.round(loanAmtFor(name)*0.05)}
-function
+function totalLoans(){return loans.filter(l=>l.status!=="Defaulted").reduce((a,l)=>a+parseInt(l.amt),0)}
+function totalExpenses(){return expenses.reduce((a,e)=>a+parseInt(e.amt),0)}
+function totalDueFor(m){return intDue(m)+5000+loanIntFor(m.name)+(m.guaranteeDue||0)}
+function hasPendingRequest(name){return loanRequests.some(r=>fixName(r.name)===fixName(name))}
+function canRequestLoan(name){ return loanAmtFor(name)===0 && !hasPendingRequest(name); }
+function findMember(name){ return members.find(m=>fixName(m.name)===fixName(name)); }
+function signatoryOptions(excludeName, excludeList){ return members.filter(m=>fixName(m.name)!==fixName(excludeName) && !(excludeList||[]).some(x=>fixName(x)===fixName(m.name))).map(m=>`<option value="${m.name}">${m.name} ${loanAmtFor(m.name)>0?'(Has Loan - Can Still Sign)':''}</option>`).join(''); }
+function rejectedSignatories(req){ let c=req.sigConfirm||{}; return (req.signatories||[]).filter(s=>c[fixName(s)]==="Rejected"); }
+function bothSignatoriesAccepted(req){ if(!req.signatories || req.signatories.length<2) return false; let c=req.sigConfirm||{}; return req.signatories.every(s=>c[fixName(s)]==="Accepted"); }
+function signatoryStatusText(req){ let c=req.sigConfirm||{}; return (req.signatories||[]).map(s=>`${s}: ${c[fixName(s)]||'Waiting'}`).join(' | '); }
+function renderAdminManage(){
+  if(!members.length) return;
+  document.getElementById('adminManageList').innerHTML = members.map((m,i)=>{
+    let checked = isExtraAdmin(m.name) ? 'checked' : '';
+    let isCore = ["Jason","Jovlet","Kato Alex"].includes(fixName(m.name));
+    return `<div class="adminRow"><input type="checkbox" id="adm-${i}" ${checked} ${isCore?'disabled checked':''}><label style="flex:1;margin:0">${m.name} ${isCore?'<span class="badge admin">CORE ADMIN - Always</span>':isExtraAdmin(m.name)?'<span class="badge admin">ADMIN</span>':''} ${isCommitteeMember(m.name)?'<span class="badge comm">Committee</span>':''}</label><small style="color:#666">Pin: ${m.pin}</small></div>`;
+  }).join('');
+}
+// CONNECTION ACTIVE - Firebase .info/connected
+onValue(ref(db, ".info/connected"), (snap)=>{
+  let connected = snap.val()===true;
+  let el=document.getElementById('syncStatus');
+  let top=document.getElementById('topSync');
+  if(el){ el.innerText = connected ? "LIVE SYNC ON - Connected" : "Connecting..."; el.style.color = connected ? "#0f9d63" : "#c62828"; }
+  if(top){ top.innerText = connected ? "LIVE SYNC ON" : "CONNECTING..."; top.style.color = connected ? "#0f9d63" : "#c62828"; }
+});
+onValue(dataRef, (snap)=>{
+  let d=snap.val();
+  if(d){ members=(d.members||[]).map(m=>({...m, name:fixName(m.name), guaranteeDue:m.guaranteeDue||0})); totals=d.totals||totals; loans=(d.loans||[]).map(l=>({...l, name:fixName(l.name), signatories:(l.signatories||[]).map(s=>fixName(s))})); expenses=d.expenses||[]; loanRequests=(d.loanRequests||[]).map(r=>({...r, name:fixName(r.name), signatories:(r.signatories||[]).map(s=>fixName(s)), sigConfirm:r.sigConfirm||{}, borrowerSeenRejection:r.borrowerSeenRejection||false})); sharesHistory=d.sharesHistory||[]; USERS=d.users||USERS;
+    // Only override extraAdmins if Firebase has it, otherwise keep default Irene/Yoram/Asan ACTIVE
+    if(d.extraAdmins && Array.isArray(d.extraAdmins) && d.extraAdmins.length>=0) {
+      // If Firebase was saved before this feature, it may be empty - keep default if empty and members not yet loaded with admins
+      // Use Firebase value if it was explicitly saved, but if empty and we have default, keep default on first load
+      if(d.extraAdmins.length>0) extraAdmins=d.extraAdmins.map(n=>fixName(n));
+    }
+    document.getElementById('syncStatus').innerText="LIVE SYNC ON - Connected"; document.getElementById('syncStatus').style.color="#0f9d63";
+    document.getElementById('loginMember').innerHTML=members.map((m,i)=>`<option value="${i}">${m.name}</option>`).join('');
+    refreshAdminMenu();
+    document.getElementById('memberPins').innerHTML=members.map((m,i)=>`<label>${m.name} ${isCommitteeMember(m.name)?'Committee':''} ${isExtraAdmin(m.name)?'- ADMIN':''} - Password</label><input id="mpin-${i}" value="${m.pin}">`).join('');
+    document.getElementById('pinJason').value=USERS.jason.pin; document.getElementById('pinJovlet').value=USERS.jovlet.pin; document.getElementById('pinKato').value=USERS.kato.pin;
+    document.getElementById('fixBox').innerHTML = `<b>Admins ACTIVE:</b> Jason, Jovlet, Kato + ${extraAdmins.join(', ')||'None'}. Connection: LIVE. <b>Add Shares:</b> Jason can add shares to any existing member.`;
+    renderAdminManage();
+    if(current) render(); } else { document.getElementById('syncStatus').innerText="Not seeded yet - Connection Active, waiting for data"; document.getElementById('syncStatus').style.color="#c62828"; refreshAdminMenu(); }
+}, (err)=>{ document.getElementById('syncStatus').innerText="Firebase Error"; document.getElementById('debugMsg').innerText=err.message; });
+async function saveToFirebase(){ await set(dataRef, {members, totals, loans, expenses, loanRequests, sharesHistory, users:USERS, extraAdmins}); }
+window.saveAdmins=async()=>{
+  if(current!=='jason'){alert('Only Jason can change admins');return;}
+  let newAdmins=[];
+  members.forEach((m,i)=>{
+    let cb=document.getElementById('adm-'+i);
+    if(cb && cb.checked && !["Jason","Jovlet","Kato Alex"].includes(fixName(m.name))) newAdmins.push(m.name);
+  });
+  extraAdmins=newAdmins;
+  await saveToFirebase();
+  refreshAdminMenu();
+  document.getElementById('adminMsg').innerText='Admins saved: Jason, Jovlet, Kato + '+(extraAdmins.join(', ')||'None')+' - Now in Admin Menu';
+  alert('Admins updated. '+extraAdmins.join(', ')+' can now login as Admin. Menu updated.');
+};
+window.fixLoanNames=async()=>{ if(current!=='jason'){alert('Only Jason');return;} members.forEach(m=>{ m.name=fixName(m.name); }); loans.forEach(l=>{ l.name=fixName(l.name); if(l.signatories) l.signatories=l.signatories.map(s=>fixName(s)); }); loanRequests.forEach(r=>{ r.name=fixName(r.name); if(r.signatories) r.signatories=r.signatories.map(s=>fixName(s)); }); await saveToFirebase(); alert('Fixed names.'); };
+window.seedData=async()=>{
+  if(current!=='jason'){alert('Only Jason can seed');return;}
+  if(!confirm('Reset to 5th Nov + Loans + Expenses?')) return;
+  members=[
+    {name:"Jovlet",reserved:500000,cleared:0,pin:"Jovlet-Member",novP:0,novI:25000,novS:5000,guaranteeDue:0},
+    {name:"Jason",reserved:250000,cleared:0,pin:"Jason-Member",novP:0,novI:12500,novS:5000,guaranteeDue:0},
+    {name:"Kato Alex",reserved:200000,cleared:50000,pin:"Kato-Member",novP:50000,novI:10000,novS:5000,guaranteeDue:0},
+    {name:"Yoram N (Kabig)",reserved:100000,cleared:0,pin:"Yoram123",novP:0,novI:5000,novS:5000,guaranteeDue:0},
+    {name:"Asan",reserved:100000,cleared:0,pin:"Asan123",novP:0,novI:5000,novS:5000,guaranteeDue:0},
+    {name:"Ziporah",reserved:200000,cleared:50000,pin:"Ziporah123",novP:50000,novI:10000,novS:5000,guaranteeDue:0},
+    {name:"Beneth",reserved:1000000,cleared:0,pin:"Beneth123",novP:0,novI:50000,novS:5000,guaranteeDue:0},
+    {name:"Irene",reserved:150000,cleared:0,pin:"Irene123",novP:0,novI:7500,novS:5000,guaranteeDue:0},
+    {name:"Sharon",reserved:100000,cleared:0,pin:"Sharon123",novP:0,novI:5000,novS:5000,guaranteeDue:0},
+    {name:"Mutembeyi",reserved:50000,cleared:0,pin:"Mutembeyi123",novP:0,novI:2500,novS:5000,guaranteeDue:0},
+    {name:"Moreen",reserved:250000,cleared:0,pin:"Moreen123",novP:0,novI:12500,novS:5000,guaranteeDue:0},
+    {name:"Sarah",reserved:400000,cleared:0,pin:"Sarah123",novP:0,novI:20000,novS:5000,guaranteeDue:0},
+    {name:"Mary",reserved:500000,cleared:0,pin:"Mary123",novP:0,novI:25000,novS:5000,guaranteeDue:0},
+    {name:"Nancy",reserved:500000,cleared:0,pin:"Nancy123",novP:0,novI:25000,novS:5000,guaranteeDue:0},
+    {name:"Oliva",reserved:200000,cleared:0,pin:"Oliva123",novP:0,novI:10000,novS:5000,guaranteeDue:0},
+    {name:"Jaston",reserved:100000,cleared:0,pin:"Jaston123",novP:0,novI:5000,novS:5000,guaranteeDue:0},
+    {name:"Naume (Mrs Pius)",reserved:250000,cleared:100000,pin:"Naume123",novP:100000,novI:12500,novS:5000,guaranteeDue:0}
+  ];
+  totals={principal:200000,interest:242500,sub:85000,penalty:0};
+  loans=[
+    {name:"Irene",amt:100000,level:"Exception",note:"Before Signatory Rule",date:"5 Nov",status:"Approved",signatories:[]},
+    {name:"Yoram N (Kabig)",amt:50000,level:"Exception",note:"Before Signatory Rule",date:"5 Nov",status:"Approved",signatories:[]},
+    {name:"Jovlet",amt:20000,level:"Exception",note:"Before Signatory Rule",date:"5 Nov",status:"Approved",signatories:[]}
+  ];
+  expenses=[{desc:"Committee - 5 Nov",amt:10000,date:"5 Nov"},{desc:"Books and Pens - 5 Nov",amt:3200,date:"5 Nov"},{desc:"Venue - 5 Nov",amt:2000,date:"5 Nov"}];
+  loanRequests=[]; sharesHistory=[]; extraAdmins=["Irene","Yoram N (Kabig)","Asan"]; await saveToFirebase(); refreshAdminMenu(); alert('Seeded! Admins: Irene, Yoram, Asan');
+};
+window.toggleMemberSelect=()=>{let t=document.getElementById('loginType').value; document.getElementById('adminBox').classList.toggle('hidden',t==='member'); document.getElementById('memberBox').classList.toggle('hidden',t!=='member');};
+window.doLogin=()=>{
+  let type=document.getElementById('loginType').value, pin=document.getElementById('loginPin').value;
+  if(type==='admin'){
+    let u=document.getElementById('loginUser').value;
+    if(u.startsWith('extra:')){
+      let name=u.replace('extra:','');
+      let m=findMember(name);
+      // If Firebase not yet loaded, allow login with known default pins for Irene/Yoram/Asan
+      let fallbackPins={"Irene":"Irene123","Yoram N (Kabig)":"Yoram123","Asan":"Asan123"};
+      let ok = (m && m.pin===pin) || (fallbackPins[name]===pin);
+      if(!ok){document.getElementById('loginMsg').innerText="Wrong Password - Use your Member Password";return;}
+      current='extra:'+name; currentIsMember=false; currentMemberIdx=-1; currentAdminDisplay=name;
+      document.getElementById('whoIs').innerHTML=`Logged in as: <b>${name} (ADMIN - Promoted)</b>`;
+    } else {
+      if(USERS[u].pin!==pin){document.getElementById('loginMsg').innerText="Wrong Password";return;}
+      current=u; currentIsMember=false; currentMemberIdx=-1; currentAdminDisplay=USERS[u].name;
+      document.getElementById('whoIs').innerHTML=`Logged in as: <b>${USERS[u].name} (${USERS[u].role}) - ADMIN</b>`;
+    }
+  }
+  else{let idx=parseInt(document.getElementById('loginMember').value); if(!members[idx]||members[idx].pin!==pin){document.getElementById('loginMsg').innerText="Wrong Password";return;} current='member'; currentIsMember=true; currentMemberIdx=idx; let m=members[idx]; let extra=isCommitteeMember(m.name)?' - COMMITTEE':''; document.getElementById('whoIs').innerHTML=`Logged in as: <b>${m.name} (Member${extra})</b>`;}
+  document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); applyPermissions(); render(); show('dash');
+};
+window.logout=()=>{current=null;currentMemberIdx=-1;currentIsMember=false;document.getElementById('loginPin').value='';document.getElementById('app').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden'); refreshAdminMenu();};
+function applyPermissions(){
+  let isJason=current==='jason', isMember=currentIsMember;
+  document.getElementById('b-collect').style.display=isMember?'none':'block';
+  document.getElementById('b-settings').style.display=isJason?'block':'none';
+  document.getElementById('addBtn').style.display=isJason?'block':'none';
+  document.getElementById('addSharesBox').style.display=isJason?'block':'none';
+  document.getElementById('loanForm').style.display=isMember?'none':'block';
+  document.getElementById('expenseForm').style.display=isMember?'none':'block';
+  document.getElementById('adminDash').style.display=isMember?'none':'block';
+  document.getElementById('memberOnlyBox').classList.toggle('hidden',!isMember);
+  document.getElementById('memberTotalsBox').classList.toggle('hidden',!isMember);
+  document.getElementById('signatoryInbox').classList.toggle('hidden',!isMember);
+  document.getElementById('borrowerAlert').classList.toggle('hidden',!isMember);
+  if(isMember){
+    let m=members[currentMemberIdx];
+    let myReq=loanRequests.find(r=>fixName(r.name)===fixName(m.name));
+    if(myReq && rejectedSignatories(myReq).length>0){
+      let rej = rejectedSignatories(myReq);
+      let kept = myReq.signatories.filter(s=>!rej.includes(s));
+      let replaceOpts = members.filter(x=>fixName(x.name)!==fixName(m.name) && !myReq.signatories.some(s=>fixName(s)===fixName(x.name))).map(x=>`<option value="${x.name}">${x.name}</option>`).join('');
+      let reqIdx = loanRequests.indexOf(myReq);
+      document.getElementById('borrowerAlert').innerHTML = rej.map(rejName=>`<div class="alertRed"><h3 style="margin:0">NOTIFICATION: ${rejName} Rejected Your Loan</h3><p>Your loan request for <b>${fmt(myReq.amt)}</b> is still alive. ${kept.join(', ')||'No one'} already accepted - kept.<br>Pick a replacement for ${rejName}.</p><label>Replacement for ${rejName}</label><select id="replaceSig-${reqIdx}-${rejName}">${replaceOpts}</select><button class="btn" onclick="replaceSignatory(${reqIdx},'${rejName}')">Replace ${rejName}</button></div>`).join('');
+    } else if(myReq && !bothSignatoriesAccepted(myReq)){
+      document.getElementById('borrowerAlert').innerHTML = `<div class="alert">Your loan ${fmt(myReq.amt)} is waiting for signatories: ${signatoryStatusText(myReq)}</div>`;
+    } else {
+      document.getElementById('borrowerAlert').innerHTML = '';
+    }
+    let myGuaranteed = loans.filter(l=>l.signatories && l.signatories.some(s=>fixName(s)===fixName(m.name)) && l.status!=="Defaulted");
+    let commBadge=isCommitteeMember(m.name)?`<br><span class="badge comm">COMMITTEE MEMBER</span>`:'';
+    let guarHtml = myGuaranteed.length ? `<div class="alert"><b>You are Signatory for:</b><br>${myGuaranteed.map(l=>`${fixName(l.name)} - ${fmt(l.amt)} (If they default, you pay ${fmt(Math.round(l.amt/2))})`).join('<br>')}</div>` : '';
+    let guarDebtHtml = (m.guaranteeDue||0)>0 ? `<div class="alertRed"><b>CHARGED AS SIGNATORY:</b> You were charged ${fmt(m.guaranteeDue)} because someone you signed for defaulted.</div>` : '';
+    let mySharesHistory = sharesHistory.filter(h=>fixName(h.name)===fixName(m.name));
+    let sharesHistHtml = mySharesHistory.length ? `<div class="alertGreen"><b>Your Shares History:</b><br>${mySharesHistory.map(h=>`+${h.shares} shares (${fmt(h.amount)}) - ${h.note||''} - ${h.date}`).join('<br>')}</div>` : '';
+    document.getElementById('memberOnlyBox').innerHTML=`<div class="mybox"><h3 style="margin:0">My Personal Status - ${m.name} - PRIVATE ${commBadge}</h3><table><tr><td>My Shares</td><td><b>${sharesCount(m)} shares (${fmt(m.reserved)})</b></td></tr><tr><td>Reserved Shares</td><td><b>${fmt(m.reserved)}</b></td></tr><tr><td>Cleared Shares</td><td><b>${fmt(m.cleared)}</b></td></tr><tr><td>Remaining Shares</td><td><b>${fmt(rem(m))}</b></td></tr><tr><td>Shares Interest Due 5 Dec</td><td>${fmt(intDue(m))}</td></tr><tr><td>My Loan Outstanding</td><td><b>${fmt(loanAmtFor(m.name))}</b></td></tr><tr><td>Loan Interest Due 5 Dec</td><td><b>${fmt(loanIntFor(m.name))}</b></td></tr><tr><td>Guarantee Debt</td><td><b style="color:#c62828">${fmt(m.guaranteeDue||0)}</b></td></tr><tr><td>Subscription</td><td>5,000</td></tr><tr><td><b>Total Due 5 Dec</b></td><td><b>${fmt(totalDueFor(m))}</b></td></tr></table>${sharesHistHtml}${guarDebtHtml}${guarHtml}${myReq?`<div class="alert">Your loan request ${fmt(myReq.amt)} - Signatories: ${signatoryStatusText(myReq)}</div>`:''}<button class="btnWA" onclick="shareWhatsApp('my')">Share My Statement</button></div>`;
+    let collected=totals.principal+totals.interest+totals.sub+totals.penalty; let cashLeft=collected-totalLoans()-totalExpenses();
+    document.getElementById('memberTotalsBox').innerHTML=`<div class="cards"><div class="card"><small>Group Total Collected</small><b>${fmt(collected)}</b></div><div class="card"><small>Total Loans Out</small><b>${fmt(totalLoans())}</b></div><div class="card"><small>Total Expenses</small><b>${fmt(totalExpenses())}</b></div><div class="card"><small>Cash Remaining with Kato</small><b>${fmt(cashLeft)}</b></div></div>`;
+    let inbox = loanRequests.filter(r=> (r.signatories||[]).some(s=>fixName(s)===fixName(m.name)) && !(r.sigConfirm||{})[fixName(m.name)] );
+    if(inbox.length){
+      document.getElementById('signatoryInbox').innerHTML = inbox.map(r=>{ let idx=loanRequests.indexOf(r); return `<div class="alertRed"><h3 style="margin:0">SIGNATORY REQUEST - Action Needed</h3><p><b>${r.name}</b> wants you to be their Signatory for <b>${fmt(r.amt)}</b><br>Reason: ${r.reason||''}<br>Other Signatory: ${(r.signatories||[]).filter(s=>fixName(s)!==fixName(m.name)).join(', ')}<br><b>If ${r.name} defaults, you will be charged ${fmt(Math.round(r.amt/2))}.</b><br><br><button class="btnSmall" style="background:#0f3d2e;color:#fff;padding:10px 18px" onclick="respondSignatory(${idx},'Accepted')">ACCEPT</button> <button class="btnSmall" style="background:#c62828;color:#fff;padding:10px 18px" onclick="respondSignatory(${idx},'Rejected')">REJECT</button></p></div>`; }).join('');
+    } else {
+      document.getElementById('signatoryInbox').innerHTML = `<div class="alertGreen">No signatory requests waiting for you.</div>`;
+    }
+  } else {
+    document.getElementById('signatoryInbox').innerHTML=''; document.getElementById('borrowerAlert').innerHTML='';
+  }
+}
+window.respondSignatory=async(idx,decision)=>{
+  if(!currentIsMember) return;
+  let m=members[currentMemberIdx];
+  let r=loanRequests[idx];
+  if(!r) return;
+  if(!r.sigConfirm) r.sigConfirm={};
+  if(r.sigConfirm[fixName(m.name)]){ alert('You already responded'); return; }
+  if(decision==='Rejected'){
+    if(!confirm(`Reject signing for ${r.name} - ${fmt(r.amt)}? ${r.name} will be notified and will pick a replacement.`)) return;
+    r.sigConfirm[fixName(m.name)]="Rejected";
+    r.borrowerSeenRejection=false;
+    await saveToFirebase();
+    alert(`You rejected. ${r.name} has been notified.`);
+    return;
+  }
+  r.sigConfirm[fixName(m.name)]="Accepted";
+  await saveToFirebase();
+  if(bothSignatoriesAccepted(r)){ alert(`You accepted. BOTH signatories accepted. Now with Committee.`); }
+  else { alert(`You accepted. Waiting for the other signatory.`); }
+};
+window.replaceSignatory=async(idx, oldSig)=>{
+  if(!currentIsMember) return;
+  let m=members[currentMemberIdx];
+  let r=loanRequests[idx];
+  if(!r || fixName(r.name)!==fixName(m.name)){ alert('Only the borrower can replace signatory'); return; }
+  let selects = document.querySelectorAll(`select[id^="replaceSig-${idx}-"]`);
+  let chosen = null;
+  selects.forEach(s=>{ if(s.id.endsWith(oldSig)) chosen=s.value; });
+  if(!chosen){ alert('Pick a replacement'); return; }
+  if(fixName(chosen)===fixName(m.name)){ alert('You cannot be your own signatory'); return; }
+  if(r.signatories.some(s=>fixName(s)===fixName(chosen))){ alert('That person is already a signatory'); return; }
+  r.signatories = r.signatories.map(s=> fixName(s)===fixName(oldSig) ? chosen : s);
+  if(r.sigConfirm) delete r.sigConfirm[fixName(oldSig)];
+  if(!r.sigConfirm) r.sigConfirm={};
+  r.votes = {};
+  r.borrowerSeenRejection = true;
+  await saveToFirebase();
+  alert(`Replaced ${oldSig} with ${chosen}.`);
+};
+window.updateAddSharesPreview=()=>{
+  let idx=document.getElementById('addSharesMember')?.value;
+  if(idx===undefined||idx==='') return;
+  let m=members[idx]; if(!m) return;
+  let count=parseInt(document.getElementById('addSharesCount').value||0);
+  let amt=count*50000;
+  document.getElementById('addSharesAmount').value = count>0 ? fmt(amt) : '';
+  document.getElementById('addSharesInfo').innerHTML=`<div class="alert"><b>${m.name}</b> - Now: ${sharesCount(m)} shares (${fmt(m.reserved)}) | Cleared ${fmt(m.cleared)} | Remaining ${fmt(rem(m))} | Interest Due ${fmt(intDue(m))}<br>${count>0?`<b>After adding ${count} shares:</b> ${sharesCount(m)+count} shares (${fmt(m.reserved+amt)}) | New Remaining ${fmt(rem(m)+amt)} | New Interest Due ${fmt(Math.round((rem(m)+amt)*0.05))} | New Total Due ${fmt(Math.round((rem(m)+amt)*0.05)+5000+loanIntFor(m.name)+(m.guaranteeDue||0))}`:'Enter shares to see preview'}</div>`;
+  let hist = sharesHistory.filter(h=>fixName(h.name)===fixName(m.name));
+  document.getElementById('sharesHistory').innerHTML = hist.length ? `<h4>Shares History for ${m.name}</h4><table><tr><th>Date</th><th>Shares Added</th><th>Amount</th><th>Note</th><th>Added By</th></tr>${hist.map(h=>`<tr><td>${h.date}</td><td>+${h.shares}</td><td>${fmt(h.amount)}</td><td>${h.note||''}</td><td>${h.by||''}</td></tr>`).join('')}</table>` : `<p style="font-size:13px;color:#666">No extra shares added yet for ${m.name} (beyond initial).</p>`;
+};
+window.addSharesToMember=async()=>{
+  if(current!=='jason'){alert('Only Jason (Super Admin) can add shares');return;}
+  let idx=parseInt(document.getElementById('addSharesMember').value);
+  let m=members[idx]; if(!m){alert('Select member');return;}
+  let count=parseInt(document.getElementById('addSharesCount').value||0);
+  if(!count || count<=0){alert('Enter shares to add - e.g. 2');return;}
+  if(count>100){ if(!confirm('That is a very large number of shares - '+count+' shares = '+fmt(count*50000)+'. Are you sure?')) return; }
+  let note=document.getElementById('addSharesNote').value || 'Added shares';
+  let amt=count*50000;
+  let oldReserved=m.reserved;
+  if(!confirm(`Add ${count} shares (${fmt(amt)}) to ${m.name}?\n\nBefore: ${fmt(oldReserved)} (${sharesCount(m)} shares)\nAfter: ${fmt(oldReserved+amt)} (${sharesCount(m)+count} shares)\nNew Interest Due: ${fmt(Math.round((rem(m)+amt)*0.05))}`)) return;
+  m.reserved+=amt;
+  sharesHistory.push({name:m.name, shares:count, amount:amt, note:note, date:new Date().toLocaleDateString('en-GB'), by:'Jason'});
+  await saveToFirebase();
+  document.getElementById('addSharesMsg').innerHTML=`Added ${count} shares (${fmt(amt)}) to ${m.name}. New Reserved: ${fmt(m.reserved)} (${sharesCount(m)} shares). Interest Due now ${fmt(intDue(m))}.`;
+  document.getElementById('addSharesCount').value=''; document.getElementById('addSharesAmount').value=''; document.getElementById('addSharesNote').value='';
+};
+window.render=()=>{
+  let totP=0,totR=0,totInt=0,totLoanInt=0,totDue=0, totReserved=0, totCleared=0; members.forEach(m=>{totP+=m.cleared;totR+=rem(m);totInt+=intDue(m);totLoanInt+=loanIntFor(m.name);totDue+=totalDueFor(m); totReserved+=m.reserved; totCleared+=m.cleared});
+  let loansOut=totalLoans(); let expTotal=totalExpenses(); let collected=totals.principal+totals.interest+totals.sub+totals.penalty; let cashLeft=collected-loansOut-expTotal;
+  if(document.getElementById('tCash')) document.getElementById('tCash').innerText=fmt(collected); document.getElementById('tLoansOut').innerText=fmt(loansOut); document.getElementById('tExpenses').innerText=fmt(expTotal); document.getElementById('tCashLeft').innerText=fmt(cashLeft); document.getElementById('tNextInt').innerText=fmt(totInt); if(document.getElementById('tLoanInt')) document.getElementById('tLoanInt').innerText=fmt(totLoanInt); if(document.getElementById('tTotalDue')) document.getElementById('tTotalDue').innerText=fmt(totDue); if(document.getElementById('tRemain')) document.getElementById('tRemain').innerText=fmt(totR); if(document.getElementById('tTotalReserved')) document.getElementById('tTotalReserved').innerText=fmt(totReserved)+` (${Math.round(totReserved/50000)} shares)`; if(document.getElementById('tTotalCleared')) document.getElementById('tTotalCleared').innerText=fmt(totCleared);
+  if(currentIsMember){
+    document.getElementById('membersTitle').innerText=`Members - ${members.length} Members (Names Only)`;
+    document.getElementById('memberNote').innerText=`You see names only. Money is private. Your shares are on Dashboard.`;
+    let h=`<div class="alertGreen"><b>Group Totals:</b> Total Reserved ${fmt(totReserved)} (${Math.round(totReserved/50000)} shares) | Loans Out ${fmt(loansOut)} | Expenses ${fmt(expTotal)} | Cash ${fmt(cashLeft)}</div>`;
+    h+=`<table><tr><th>#</th><th>Member Name</th><th>Role</th></tr>`;
+    members.forEach((m,idx)=>{ let isMe=idx===currentMemberIdx; let role=isAdminName(m.name)?'<span class="badge admin">Admin + Committee</span>':isCommitteeMember(m.name)?'<span class="badge comm">Committee (Not Admin)</span>':'<span class="badge clear">Member</span>'; h+=`<tr style="${isMe?'background:#e8f5e9':''}"><td>${idx+1}</td><td><b>${m.name} ${isMe?' (You)':''}</b></td><td>${role}</td></tr>`});
+    h+=`</table>`; document.getElementById('memberTable').innerHTML=h;
+  } else {
+    document.getElementById('membersTitle').innerText=`Members List - ${members.length} Members (Admin View)`;
+    document.getElementById('memberNote').innerText=`Admin View: Shares in shares + UGX. Use Add Shares below to top-up any member.`;
+    let h=`<table><tr><th>Member</th><th>Shares</th><th>Reserved</th><th>Cleared</th><th>Remaining</th><th>Loan Out</th><th>Guarantee Debt</th><th>Due 5 Dec</th></tr>`;
+    members.forEach(m=>{ let role=isAdminName(m.name)?'<br><span class="badge admin">ADMIN + COMMITTEE</span>':isCommitteeMember(m.name)?'<br><span class="badge comm">COMMITTEE</span>':''; h+=`<tr><td><b>${m.name}</b> ${role}</td><td><b>${sharesCount(m)}</b></td><td>${fmt(m.reserved)}</td><td>${fmt(m.cleared)}</td><td>${fmt(rem(m))}</td><td>${loanAmtFor(m.name)?'<b style="color:#c62828">'+fmt(loanAmtFor(m.name))+'</b>':'-'}</td><td>${(m.guaranteeDue||0)>0?'<b style="color:#c62828">'+fmt(m.guaranteeDue)+'</b>':'-'}</td><td><b>${fmt(totalDueFor(m))}</b></td></tr>`}); h+=`<tr><td><b>TOTAL</b></td><td><b>${Math.round(totReserved/50000)}</b></td><td><b>${fmt(totReserved)}</b></td><td><b>${fmt(totCleared)}</b></td><td><b>${fmt(totR)}</b></td><td><b>${fmt(loansOut)}</b></td><td></td><td><b>${fmt(totDue)}</b></td></tr></table>`;
+    document.getElementById('memberTable').innerHTML=h;
+    document.getElementById('dashList').innerHTML=`<h4>Admin Dashboard - Full Member List</h4>`+h;
+    let prev=document.getElementById('addSharesMember').value;
+    document.getElementById('addSharesMember').innerHTML=members.map((m,i)=>`<option value="${i}">${m.name} - ${sharesCount(m)} shares (${fmt(m.reserved)}) - Remaining ${fmt(rem(m))}</option>`).join('');
+    if(prev) document.getElementById('addSharesMember').value=prev;
+    updateAddSharesPreview();
+  }
+  let opts=members.map((m,i)=>`<option value="${i}">${m.name} - Due ${fmt(totalDueFor(m))}</option>`).join(''); document.getElementById('selMember').innerHTML=opts; document.getElementById('loanMember').innerHTML=opts; updateCollectForm();
+  let e=`<table><tr><th>Member</th><th>Shares</th><th>Shares Interest</th><th>Loan Interest</th><th>Guarantee Debt</th><th>Sub</th><th>Total Due 5 Dec</th></tr>`; members.forEach(m=>{e+=`<tr><td>${m.name}</td><td>${sharesCount(m)} (${fmt(m.reserved)})</td><td>${fmt(intDue(m))}</td><td>${fmt(loanIntFor(m.name))}</td><td>${fmt(m.guaranteeDue||0)}</td><td>5,000</td><td><b>${fmt(totalDueFor(m))}</b></td></tr>`}); e+=`<tr><td><b>TOTAL</b></td><td><b>${Math.round(totReserved/50000)}</b></td><td><b>${fmt(totInt)}</b></td><td><b>${fmt(totLoanInt)}</b></td><td><b>${fmt(members.reduce((a,m)=>a+(m.guaranteeDue||0),0))}</b></td><td><b>${fmt(85000)}</b></td><td><b>${fmt(totDue)}</b></td></tr></table>`; document.getElementById('expectedTable').innerHTML=e;
+  if(currentIsMember){
+    let m=members[currentMemberIdx];
+    let eligible=canRequestLoan(m.name);
+    let blockReason='';
+    if(loanAmtFor(m.name)>0) blockReason=`You have an outstanding loan of ${fmt(loanAmtFor(m.name))}. Clear it first.`;
+    else if(hasPendingRequest(m.name)) blockReason=`You already have a pending loan request. Check Dashboard.`;
+    let sigOpts = signatoryOptions(m.name, []);
+    document.getElementById('memberLoanRequestBox').innerHTML= eligible ?
+    `<div class="alertGreen"><h4 style="margin:0">Request a Loan - Pick 2 Signatories Who Must Accept</h4><p style="font-size:13px">If one rejects, you will be notified and pick a replacement - no restart.</p><label>Amount Requested</label><input id="memberLoanAmt" type="number" placeholder="e.g. 100000"><label>Reason</label><input id="memberLoanReason" placeholder="e.g. School fees"><label>Signatory 1 - Must Accept</label><select id="memberSig1">${sigOpts}</select><label>Signatory 2 - Must Accept</label><select id="memberSig2">${sigOpts}</select><button class="btn" onclick="memberRequestLoan()">Send Request to Signatories</button><p id="memberLoanMsg"></p></div>`
+    : `<div class="alert"><h4 style="margin:0">Loan Request - Not Available</h4><p style="font-size:13px">${blockReason}</p></div>`;
+    if(eligible){ let s1=document.getElementById('memberSig1'); let s2=document.getElementById('memberSig2'); if(s1 && s2 && s1.options.length>1){ s2.selectedIndex=1; } }
+  } else {
+    document.getElementById('memberLoanRequestBox').innerHTML=``;
+    let adminExclude = members[parseInt(document.getElementById('loanMember')?.value||0)]?.name || "";
+    let sigOptsAdmin = signatoryOptions(adminExclude, []);
+    let a1=document.getElementById('loanSig1'); let a2=document.getElementById('loanSig2');
+    if(a1) a1.innerHTML=sigOptsAdmin; if(a2) a2.innerHTML=sigOptsAdmin; if(a2 && a2.options.length>1) a2.selectedIndex=1;
+  }
+  let loansToShow = currentIsMember ? loans.filter(l=>fixName(l.name)===fixName(members[currentMemberIdx].name)) : loans;
+  let l=`<h4>${currentIsMember?'My Loans':'Approved Loans - Money Out (Admin View)'}</h4>`;
+  if(currentIsMember && loansToShow.length===0) l+=`<p style="font-size:13px">You have no active loan.</p>`;
+  else { l+=`<table><tr><th>Member</th><th>Loan</th><th>Interest Due 5 Dec</th><th>Signatories (Confirmed)</th><th>Status</th>${!currentIsMember?'<th>Action</th>':''}</tr>`; loansToShow.forEach((x,idx)=>{ let globalIdx=loans.indexOf(x); let sigText=(x.signatories && x.signatories.length)?x.signatories.map(s=>`<span class="badge guar">${s} Accepted</span>`).join(' '):'<small>No signatories (Before Rule)</small>'; l+=`<tr><td><b>${x.name}</b></td><td><b>${fmt(x.amt)}</b></td><td><b>${fmt(Math.round(x.amt*0.05))}</b></td><td>${sigText}</td><td><span class="badge ${x.status==='Defaulted'?'rej':'appr'}">${x.status||'Approved'}</span></td>${!currentIsMember?`<td>${x.status!=='Defaulted'?`<button class="btnSmall" style="background:#c62828;color:#fff" onclick="markDefaulted(${globalIdx})">Mark Defaulted - Charge Signatories</button>`:'Charged'}</td>`:''}</tr>`}); if(!currentIsMember) l+=`<tr><td><b>TOTAL ACTIVE</b></td><td><b>${fmt(loansOut)}</b></td><td><b>${fmt(totLoanInt)}</b></td><td></td><td></td><td></td></tr>`; l+=`</table>`; }
+  let defaulted = loans.filter(x=>x.status==="Defaulted");
+  if(!currentIsMember && defaulted.length){ l+=`<h4>Defaulted Loans - Charged to Signatories</h4><table><tr><th>Borrower</th><th>Amount</th><th>Signatories Charged</th><th>Each Paid</th></tr>`; defaulted.forEach(x=>{ l+=`<tr><td>${x.name}</td><td>${fmt(x.amt)}</td><td>${(x.signatories||[]).join(' + ')}</td><td>${fmt(Math.round(x.amt/2))} each</td></tr>`}); l+=`</table>`; }
+  l+=`<h4>${currentIsMember && !isCommitteeMember(members[currentMemberIdx].name) ? 'My Pending Request' : 'Pending Loan Requests'}</h4>`;
+  let reqToShow = currentIsMember ? (isCommitteeMember(members[currentMemberIdx].name) ? loanRequests : loanRequests.filter(r=>fixName(r.name)===fixName(members[currentMemberIdx].name))) : loanRequests;
+  if(!reqToShow.length) l+=`<p style="font-size:13px;color:#666">No pending requests.</p>`;
+  else { l+=`<table><tr><th>Member</th><th>Amount</th><th>Reason</th><th>Signatories</th><th>Committee Votes</th>${isCurrentCommittee()?'<th>Your Vote</th>':''}</tr>`; reqToShow.forEach((r)=>{ let idx=loanRequests.indexOf(r); let v=r.votes||{}; let bothAcc=bothSignatoriesAccepted(r); let voteText=`Jason: ${v.jason||'Pending'} | Jovlet: ${v.jovlet||'Pending'} | Kato: ${v.kato||'Pending'} | Asan: ${v.asan||'Pending'} | Yoram: ${v.yoram||'Pending'} | Irene: ${v.irene||'Pending'}`; let approveCount=Object.values(v).filter(x=>x==='Approved').length; let myKey=myCommitteeKey(); let sigText=(r.signatories||[]).map(s=>{ let st=(r.sigConfirm||{})[fixName(s)]||'Waiting'; return `<span class="badge ${st==='Accepted'?'appr':st==='Rejected'?'rej':'wait'}">${s}: ${st}</span>`; }).join('<br>'); let sigCol = sigText + `<br><b>${bothAcc?'Both Accepted - Committee Can Vote':'Waiting / Replacement Needed'}</b>`; let voteCol = bothAcc ? `<small>${voteText}</small><br><b>${approveCount}/6 Approved</b>` : `<small>Committee voting locked until both signatories Accept</small>`; l+=`<tr><td><b>${r.name}</b></td><td><b>${fmt(r.amt)}</b></td><td>${r.reason||''}</td><td>${sigCol}</td><td>${voteCol}</td>${isCurrentCommittee()?`<td>${!bothAcc ? `<span class="badge wait">Wait for Signatories</span>` : (!v[myKey] ? `<button class="btnSmall" style="background:#0f3d2e;color:#fff" onclick="voteLoan(${idx},'Approved')">Approve</button> <button class="btnSmall" style="background:#c62828;color:#fff" onclick="voteLoan(${idx},'Rejected')">Reject</button>` : `<span class="badge ${v[myKey]==='Approved'?'appr':'rej'}">You voted: ${v[myKey]}</span>`)}</td>`:''}</tr>`}); l+=`</table>`; }
+  document.getElementById('loanTable').innerHTML=l;
+  if(currentIsMember){
+    let m=members[currentMemberIdx];
+    let r=`<div class="alertGreen"><h4 style="margin:0">Your 5th Nov Record - Private</h4><table><tr><td>Shares</td><td><b>${sharesCount(m)} shares (${fmt(m.reserved)})</b></td></tr><tr><td>Principal Paid 5 Nov</td><td><b>${fmt(m.novP||0)}</b></td></tr><tr><td>Interest Paid 5 Nov</td><td><b>${fmt(m.novI||0)}</b></td></tr><tr><td>Sub Paid 5 Nov</td><td><b>${fmt(m.novS||0)}</b></td></tr></table></div>`;
+    document.getElementById('reportTable').innerHTML=r;
+  } else {
+    let r=`<table><tr><th>Member</th><th>Shares</th><th>Reserved</th><th>Prin 5 Nov</th><th>Int 5 Nov</th><th>Sub 5 Nov</th><th>Total 5 Nov</th></tr>`;
+    members.forEach(m=>{r+=`<tr><td>${m.name}</td><td>${sharesCount(m)}</td><td>${fmt(m.reserved)}</td><td>${fmt(m.novP||0)}</td><td>${fmt(m.novI||0)}</td><td>${fmt(m.novS||0)}</td><td><b>${fmt((m.novP||0)+(m.novI||0)+(m.novS||0))}</b></td></tr>`});
+    r+=`<tr><td><b>TOTAL</b></td><td><b>${Math.round(totReserved/50000)}</b></td><td><b>${fmt(totReserved)}</b></td><td><b>${fmt(200000)}</b></td><td><b>${fmt(242500)}</b></td><td><b>${fmt(85000)}</b></td><td><b>${fmt(527500)}</b></td></tr></table>`;
+    if(sharesHistory.length){ r+=`<h4>Shares Top-Up History</h4><table><tr><th>Date</th><th>Member</th><th>Shares Added</th><th>Amount</th><th>Note</th></tr>${sharesHistory.map(h=>`<tr><td>${h.date}</td><td>${h.name}</td><td>+${h.shares}</td><td>${fmt(h.amount)}</td><td>${h.note||''}</td></tr>`).join('')}</table>`; }
+    document.getElementById('reportTable').innerHTML=r;
+  }
+  if(currentIsMember){
+    document.getElementById('expenseNote').innerText=`Member View: You see TOTAL expenses only.`;
+    document.getElementById('expenseTable').innerHTML=`<div class="alertGreen"><b>Group Total Expenses:</b> ${fmt(expTotal)}</div>`;
+  } else {
+    document.getElementById('expenseNote').innerText=`Admin View: Full expenses history - Total ${fmt(expTotal)}.`;
+    let ex=`<table><tr><th>Description</th><th>Amount</th><th>Date</th></tr>`; expenses.forEach(e=>{ex+=`<tr><td>${e.desc}</td><td>${fmt(e.amt)}</td><td>${e.date||''}</td></tr>`}); ex+=`<tr><td><b>TOTAL EXPENSES</b></td><td><b>${fmt(expTotal)}</b></td><td></td></tr></table>`; document.getElementById('expenseTable').innerHTML=ex;
+  }
+  applyPermissions();
+};
+function updateCollectForm(){let i=document.getElementById('selMember').value||0; let m=members[i]; if(!m) return; document.getElementById('inpInterest').value=intDue(m); document.getElementById('inpLoanInt').value=loanIntFor(m.name); let la=loanAmtFor(m.name); document.getElementById('collectInfo').innerHTML=`<div class="alert">${m.name}: ${sharesCount(m)} shares | Shares Remaining <b>${fmt(rem(m))}</b> | Shares Int <b>${fmt(intDue(m))}</b> | Loan Out <b>${fmt(la)}</b> | Loan Int <b>${fmt(loanIntFor(m.name))}</b> | Guarantee Debt <b>${fmt(m.guaranteeDue||0)}</b> | <b>Total Due ${fmt(totalDueFor(m))}</b></div>`;}
+document.getElementById('selMember')?.addEventListener('change',updateCollectForm);
+document.getElementById('addSharesMember')?.addEventListener('change',updateAddSharesPreview);
+window.recordPayment=async()=>{let i=document.getElementById('selMember').value; let m=members[i]; let p=parseInt(document.getElementById('inpPrincipal').value||0); let intr=parseInt(document.getElementById('inpInterest').value||0); let loanInt=parseInt(document.getElementById('inpLoanInt').value||0); let loanPrin=parseInt(document.getElementById('inpLoanPrin').value||0); let sub=parseInt(document.getElementById('inpSub').value||0); let pen=parseInt(document.getElementById('inpPenalty').value||0); if(p>rem(m)){alert('Too much shares principal!');return;} if(loanPrin>loanAmtFor(m.name)){alert('Loan repayment too high!');return;} m.cleared+=p; totals.principal+=p; totals.interest+=intr+loanInt; totals.sub+=sub; totals.penalty+=pen; if(loanPrin>0){ let remaining=loanPrin; let newLoans=[]; loans.forEach(l=>{ if(fixName(l.name)===fixName(m.name) && remaining>0 && l.status!=="Defaulted"){ if(l.amt<=remaining){ remaining-=l.amt; } else { newLoans.push({...l, amt:l.amt-remaining}); remaining=0; } } else newLoans.push(l); }); loans=newLoans; } await saveToFirebase(); document.getElementById('collectMsg').innerHTML=`Synced! ${m.name}`; document.getElementById('inpPrincipal').value=''; document.getElementById('inpLoanPrin').value='0';};
+window.memberRequestLoan=async()=>{
+  let m=members[currentMemberIdx]; if(!canRequestLoan(m.name)){document.getElementById('memberLoanMsg').innerText='You cannot request.';return;}
+  let amt=parseInt(document.getElementById('memberLoanAmt').value||0); let reason=document.getElementById('memberLoanReason').value;
+  let s1=document.getElementById('memberSig1').value; let s2=document.getElementById('memberSig2').value;
+  if(!amt){alert('Enter amount');return;}
+  if(!s1||!s2){alert('You MUST pick 2 signatories');return;}
+  if(s1===s2){alert('Pick 2 different signatories');return;}
+  if(fixName(s1)===fixName(m.name)||fixName(s2)===fixName(m.name)){alert('You cannot be your own signatory.');return;}
+  loanRequests.push({name:m.name,amt,reason,by:m.name+" (Member Request)",date:"5 Dec",votes:{},signatories:[s1,s2],sigConfirm:{},borrowerSeenRejection:true}); await saveToFirebase(); document.getElementById('memberLoanMsg').innerText=`Request ${fmt(amt)} sent to ${s1} + ${s2} for confirmation.`;};
+window.proposeLoan=async()=>{
+  let i=document.getElementById('loanMember').value; let m=members[i]; if(!canRequestLoan(m.name)){document.getElementById('loanMsg').innerText=`${m.name} cannot request.`;return;}
+  let amt=parseInt(document.getElementById('loanAmt').value||0); let reason=document.getElementById('loanReason').value;
+  let s1=document.getElementById('loanSig1').value; let s2=document.getElementById('loanSig2').value;
+  if(!amt){alert('Enter amount');return;}
+  if(!s1||!s2){alert('You MUST pick 2 signatories');return;}
+  if(s1===s2){alert('Pick 2 different signatories');return;}
+  if(fixName(s1)===fixName(m.name)||fixName(s2)===fixName(m.name)){alert('Borrower cannot be own signatory');return;}
+  let by=current==='jason'?'Jason':current==='jovlet'?'Jovlet':current==='kato'?'Kato Alex':current.startsWith('extra:')?current.replace('extra:',''):current; loanRequests.push({name:m.name,amt,reason,by:by+" (Admin Proposed)",date:"5 Dec",votes:{},signatories:[s1,s2],sigConfirm:{},borrowerSeenRejection:true}); await saveToFirebase(); document.getElementById('loanMsg').innerText=`Proposed ${fmt(amt)} for ${m.name} with Signatories ${s1} + ${s2}`; document.getElementById('loanAmt').value=''; document.getElementById('loanReason').value='';};
+window.voteLoan=async(idx,decision)=>{
+  let r=loanRequests[idx];
+  if(!bothSignatoriesAccepted(r)){ alert('Committee cannot vote yet - waiting for both signatories to Accept.'); return; }
+  let myKey=myCommitteeKey(); if(!myKey){alert('Only Committee can vote');return;} if(!r.votes) r.votes={}; if(r.votes[myKey]){alert('You already voted');return;} r.votes[myKey]=decision; if(decision==='Rejected'){ loanRequests.splice(idx,1); await saveToFirebase(); alert(`You rejected loan for ${r.name}.`); return; } let approvals=Object.values(r.votes).filter(v=>v==='Approved').length; if(approvals===6){ loans.push({name:r.name,amt:r.amt,level:"Committee",note:"Approved 6/6 - Signatories Confirmed - "+(r.reason||''),date:r.date||"5 Dec",status:"Approved",signatories:r.signatories||[]}); loanRequests.splice(idx,1); await saveToFirebase(); alert(`ALL 6 APPROVED! Loan ${fmt(r.amt)} for ${r.name} now active.`); } else { await saveToFirebase(); alert(`You approved. Now ${approvals}/6.`); }};
+window.markDefaulted=async(idx)=>{
+  let loan=loans[idx]; if(!loan || loan.status==="Defaulted") return;
+  if(!confirm(`Mark ${loan.name} loan ${fmt(loan.amt)} as DEFAULTED? This will charge signatories ${(loan.signatories||[]).join(' + ')} - ${fmt(Math.round(loan.amt/2))} each.`)) return;
+  if(!loan.signatories || loan.signatories.length<2){ alert('This old loan has no signatories (before rule). Handle manually.'); return; }
+  let each = Math.round(loan.amt/2);
+  loan.signatories.forEach(sigName=>{ let mem=findMember(sigName); if(mem){ mem.guaranteeDue=(mem.guaranteeDue||0)+each; } });
+  loan.status="Defaulted"; await saveToFirebase(); alert(`Defaulted! ${loan.signatories[0]} charged ${fmt(each)}, ${loan.signatories[1]} charged ${fmt(each)}.`); };
+window.addExpense=async()=>{let d=document.getElementById('expDesc').value; let a=parseInt(document.getElementById('expAmt').value||0); if(!d||!a){alert('Enter description and amount');return;} expenses.push({desc:d,amt:a,date:"5 Dec"}); await saveToFirebase(); document.getElementById('expMsg').innerText=`Expense ${fmt(a)} added`; document.getElementById('expDesc').value=''; document.getElementById('expAmt').value='';};
+window.addMember=async()=>{if(current!=='jason'){alert('Only Super Admin Jason can add members');return;} let n=prompt('New Member Name:'); if(!n)return; let s=parseInt(prompt('Shares? 1 share = 50,000. Enter number of shares:')); if(!s)return; let pin=prompt('Set Password for '+n); members.push({name:n,reserved:s*50000,cleared:0,pin:pin||"ChangeMe123",novP:0,novI:Math.round(s*50000*0.05),novS:5000,guaranteeDue:0}); await saveToFirebase(); alert('Added '+n+' - '+s+' shares ('+fmt(s*50000)+')');};
+window.savePins=async()=>{USERS.jason.pin=document.getElementById('pinJason').value; USERS.jovlet.pin=document.getElementById('pinJovlet').value; USERS.kato.pin=document.getElementById('pinKato').value; members.forEach((m,i)=>{let v=document.getElementById('mpin-'+i).value; if(v) m.pin=v}); await saveToFirebase(); document.getElementById('pinMsg').innerText='Passwords saved.';};
+window.show=(id)=>{['dash','members','collect','loans','report','expenses','settings'].forEach(x=>{document.getElementById(x).classList.toggle('hidden',x!==id); document.getElementById('b-'+x).classList.toggle('active',x===id);});};
+window.shareWhatsApp=(type)=>{let text=""; if(type==='dashboard'){text=`EKITIBIKO SAVINGS GROUP - DASHBOARD\nCollected: 527,500\nLoans Out: 170,000\nExpenses: 15,200\nCash with Kato: 342,300`} if(type==='expected'){text=`EKITIBIKO SAVINGS GROUP - DUE 5th Dec\n`+members.map(m=>`${m.name}: ${sharesCount(m)} shares, Shares Int ${intDue(m).toLocaleString()} + Loan Int ${loanIntFor(m.name).toLocaleString()} + Guarantee ${(m.guaranteeDue||0).toLocaleString()} + Sub 5,000 = ${totalDueFor(m).toLocaleString()}`).join('\n');} if(type==='report'){text=`EKITIBIKO SAVINGS GROUP 5th Nov REPORT\nCollected 527,500\nLoans 170,000\nCash Remaining: 342,300\nTotal Reserved: ${members.reduce((a,m)=>a+m.reserved,0).toLocaleString()}\n© Copyright Jarols Tech 2026`} if(type==='my'){let m=members[currentMemberIdx]; text=`Hello, this is ${m.name} - EKITIBIKO SAVINGS GROUP. Shares ${sharesCount(m)} (${m.reserved.toLocaleString()}), Cleared ${m.cleared.toLocaleString()}, Remaining ${rem(m).toLocaleString()}, Loan ${loanAmtFor(m.name).toLocaleString()}, Due 5 Dec ${totalDueFor(m).toLocaleString()}\n© Copyright Jarols Tech 2026`;} window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");};
+} catch(e){ document.getElementById('syncStatus').innerText="Error loading app"; document.getElementById('debugMsg').innerText=e.message; }
+</script>
+</body>
+</html>
