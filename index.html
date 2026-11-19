@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>EKITIBIKO SAVINGS GROUP</title>
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif}body{margin:0;background:#f2f4f7;padding-bottom:50px}
@@ -26,6 +26,28 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#0f3d2e;color:#fff;text
 .myMemberSection{border:3px solid #7c3aed;border-radius:14px;padding:4px 12px 12px;margin:14px 0;background:#faf5ff}
 .crudBox{border:3px solid #7c3aed;background:#faf5ff;border-radius:12px;padding:14px;margin:12px 0}
 .finesBox{background:#fef3c7;border:2px solid #f59e0b;border-radius:12px;padding:12px;margin:10px 0;font-size:13px}
+/* ===== Responsive: any phone, tablet or browser ===== */
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{overflow-x:hidden;padding-bottom:60px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#0f3d2e;z-index:60}
+img{max-width:100%}
+.wrap{max-width:1200px;padding:12px clamp(8px,2vw,24px)}
+.cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}
+.card b{font-size:clamp(15px,4.2vw,19px);overflow-wrap:anywhere}
+input,select{font-size:16px;min-height:44px;max-width:100%}
+.btn,.btnWA{min-height:46px;font-size:15px}
+.btnSmall{min-height:34px;margin:2px 0}
+.login{width:calc(100% - 24px);margin:16px auto}
+header h1{font-size:clamp(15px,4.5vw,22px)}
+.topbar{flex-wrap:wrap;gap:6px}
+.dualHeader{flex-wrap:wrap;gap:6px}
+.nav{top:env(safe-area-inset-top,0px);z-index:50;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+footer{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+#memberTable,#dashList,#expectedTable,#loanTable,#loanPeriodBox,#reportTable,#expenseTable,#repayHistory,#sharesHistory,#crudMembers,#crudExpenses,#crudLoans,#crudRequests,#crudSharesHist,#adminManageList{overflow-x:auto;-webkit-overflow-scrolling:touch}
+th,td{vertical-align:top}
+@media(max-width:700px){table{min-width:520px}.mybox table,.alertGreen table,.alert table{min-width:0}th,td{padding:8px 6px;font-size:12px}.nav button{padding:9px 12px}.adminRow{flex-wrap:wrap}}
+@media(min-width:900px){.nav{flex-wrap:wrap;justify-content:center}}
 </style>
 </head>
 <body>
