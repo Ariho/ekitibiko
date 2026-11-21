@@ -54,10 +54,15 @@ th,td{vertical-align:top}
 .avatarInit{display:inline-flex;align-items:center;justify-content:center;color:#0f3d2e;font-weight:bold}
 .profileHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .profileHead .avatar{margin-right:0}
+.langSwitch{display:flex;justify-content:center;gap:6px;margin:0 0 10px}
+.topbar .langSwitch{margin:0}
+.langBtn{border:1px solid #0f3d2e;background:#fff;color:#0f3d2e;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:bold;cursor:pointer;min-height:30px}
+.langBtn.active{background:#0f3d2e;color:#fff}
 </style>
 </head>
 <body>
 <div id="loginScreen" class="login">
+<div class="langSwitch"><button type="button" class="langBtn" data-lang="rny" onclick="setLang('rny')">Runyankole</button><button type="button" class="langBtn" data-lang="en" onclick="setLang('en')">English</button></div>
 <h2 style="text-align:center;margin:0">EKITIBIKO SAVINGS GROUP</h2><p style="text-align:center;color:#666;font-size:13px"><span class="sync" id="syncStatus">Connecting...</span><br><span id="debugMsg" style="font-size:11px;color:#c62828"></span></p>
 <label>Login As</label><select id="loginType" onchange="toggleMemberSelect()"><option value="admin">Admin</option><option value="member">Member</option></select>
 <div id="adminBox"><label>Admin User</label><select id="loginUser"></select></div>
@@ -67,7 +72,7 @@ th,td{vertical-align:top}
 </div>
 <div id="app" class="hidden">
 <header><h1>EKITIBIKO SAVINGS GROUP</h1></header>
-<div class="topbar"><span id="whoIs"></span><span class="sync" id="topSync">LIVE SYNC ON</span><button onclick="logout()" style="border:0;background:#c62828;color:#fff;padding:6px 12px;border-radius:20px;font-weight:bold;cursor:pointer">Logout</button></div>
+<div class="topbar"><span id="whoIs"></span><span class="sync" id="topSync">LIVE SYNC ON</span><span class="langSwitch"><button type="button" class="langBtn" data-lang="rny" onclick="setLang('rny')">Runyankole</button><button type="button" class="langBtn" data-lang="en" onclick="setLang('en')">English</button></span><button onclick="logout()" style="border:0;background:#c62828;color:#fff;padding:6px 12px;border-radius:20px;font-weight:bold;cursor:pointer">Logout</button></div>
 <div class="nav" id="mainNav"><button onclick="show('dash')" id="b-dash" class="active">Dashboard</button><button onclick="show('members')" id="b-members">Members</button><button onclick="show('collect')" id="b-collect">Collect on 5th</button><button onclick="show('loans')" id="b-loans">Loans</button><button onclick="show('report')" id="b-report">Report</button><button onclick="show('expenses')" id="b-expenses">Expenses</button><button onclick="show('settings')" id="b-settings">Settings</button><button onclick="show('crud')" id="b-crud" style="background:#7c3aed;color:#fff;border-color:#7c3aed">Super Admin CRUD</button></div>
 <div class="wrap">
 <div id="dash">
@@ -107,35 +112,41 @@ th,td{vertical-align:top}
 <input type="file" id="photoInput" accept="image/*" style="display:none">
 <footer>© Copyright Jarols Tech 2026</footer>
 <script type="module">
-// ===== LANGUAGE: Runyankole (add ?lang=en to the web address to see English) =====
-const LANG=(new URLSearchParams(location.search).get('lang'))||'rny';
+// ===== LANGUAGE: Runyankole (default) / English, chosen with the buttons =====
+let LANG=(()=>{ let u=new URLSearchParams(location.search).get('lang'); if(u==='en'||u==='rny') return u; try{ let l=localStorage.getItem('ekLang'); if(l==='en'||l==='rny') return l; }catch(e){} return 'rny'; })();
+const trOrig=new Map();
 const T_EXACT={
  'Login As':'Ori memba ninga owakakiko','Admin':'Akakiko','Member':'Memba',
  'Select Your Name':'Londa eizina lyawe','Password':'Tekamu passiwad aha','Login':'Gumizamu',
  'Logged in as:':'Niiwe:','Logout':'Naheza',
- 'Dashboard':'Ahokuhikira','Members':'Bamemba','Loans':'Okweguza',
- 'No signatory requests waiting for you.':"Tihariho abakushaba nk'omwema",
+ 'Dashboard':'Ahokuhikira','Members':'Abanyakibiina','Loans':'Okweguza',
+ 'No signatory requests waiting for you.':"Tihariho abarikukwenda nk'omwema",
  'Upload / Change Photo':'Hindura ekishani','Remove':'Kyiheho',
  'My Shares':'Emigabo yawe','Reserved Shares':'Emigabo eyoshabire','Cleared Shares':'Emigabo eshashwire','Remaining Shares':'Emigabo etashashwire',
  'Shares Interest Due 5 Dec':"Amagoba g'emigabo",'My Loan':'Loni yawe','Loan Interest Due 5 Dec':'Amagoba aha loni',
- 'Subscription':'Okushuka (Buli kwezi)','Total Due 5 Dec':'Nobanjibwa','Share My Statement':'Sindika sitatimenti yangye',
- 'Group Totals':'SENTE ZOONA OMUKIBINA','Total Loans Out':'Ezeguzirwe / loni zoona','Total Shares':'Emigabo yoona',
- 'Net Cash':"Sente ow'omubiiki",'Total Fines':'Fayini zoona', 'adds':'yayongyera',
- 'Request a Loan':'Shaba loni','Amount':'Omuhendo','Reason':'Enshonga yawe', 'shares':'Emigabo',
- 'Signatory 1':'Torana omwema wokubanza','Signatory 2':'Torana omwema wakabiri','Shares History':'Okwongera ahamigabo',
- 'Send Request + WhatsApp to Group':'Sindika okushaba kwawe aha WhatsApp',
+ 'Subscription':'Okushuka (Buli kwezi)','Total Due 5 Dec':'Nobanjibwa (5 Dec)','Share My Statement':'Sindika sitatimenti yangye',
+ 'Group Totals':'SENTE ZOONA OMUKIBINA','Total Loans Out':'Ezeguzirwe / loni zoona','Total Shares':'Emigabo yoona(Eshashwire)',
+ 'Net Cash':"Sente ow'omubiiki",'Total Fines':'Fayini zoona',
+ 'Request a Loan':'Shaba loni','Amount':'Omuhendo','Reason':'Enshonga yawe',
+ 'Signatory 1':'Torana omwema wokubanza','Signatory 2':'Torana omwema wakabiri',
+ 'Send Request + WhatsApp to Group':'Sindika okushaba kwawe aha whatsap',
  'No active loan.':'Tokubanjibwa','Loan Periods (3 months)':'Obwire bwa loni (Emyezi eshatu)',
  'Loan':'Loni','Count Starts':'Yatandika','Due':'Nehwayo','Status':'Eyemerire eta','Action':'Enshalaho','Running':'Tekashashirwe',
- 'Loan Request':'Okushaba Kwawe','Loan Request:':'Okushaba Kwawe:','Approved':'Eykirizibwe','Signatories':'Abema bawe','Admin User':'Eizina lyawe'
+ 'Loan Request':'Okushaba Kwawe','Loan Request:':'Okushaba Kwawe:','Approved':'Eykirizibwe'
 };
 const T_BY_ID={'b-loans':'Okweguza / Loni'};
 const T_PATTERNS=[
  [/^You have an unpaid loan of (UGX [\d,]+)\.$/,(m,a)=>`Oyineyo loni ya ${a}.`],
  [/^(UGX [\d,]+) - (.+?) - Signatories: (.*) - Due (.+)$/,(m,a,st,sg,du)=>`${a} - ${T_EXACT[st]||st} - Abema bawe: ${sg} - Neshashurwa: ${du}`]
 ];
-function trNode(n){ let s=n.nodeValue, t=s.trim(); if(!t) return; let pid=n.parentNode&&n.parentNode.id; let v=(pid&&T_BY_ID[pid]!==undefined)?T_BY_ID[pid]:T_EXACT[t]; if(v===undefined){ for(const [re,fn] of T_PATTERNS){ let m=t.match(re); if(m){ v=fn(...m); break; } } } if(v!==undefined && v!==t) n.nodeValue=s.replace(t,()=>v); }
+function trNode(n){ let s=n.nodeValue, t=s.trim(); if(!t) return; let pid=n.parentNode&&n.parentNode.id; let v=(pid&&T_BY_ID[pid]!==undefined)?T_BY_ID[pid]:T_EXACT[t]; if(v===undefined){ for(const [re,fn] of T_PATTERNS){ let m=t.match(re); if(m){ v=fn(...m); break; } } } if(v!==undefined && v!==t){ if(trOrig.size>4000){ for(const k of [...trOrig.keys()]){ if(!k.isConnected) trOrig.delete(k); } } trOrig.set(n,s); n.nodeValue=s.replace(t,()=>v); } }
 function trTree(root){ if(!root) return; if(root.nodeType===3){ trNode(root); return; } if(root.nodeType!==1) return; let w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(t){ let p=t.parentNode; return (p && /^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName))?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT; }}); let list=[]; while(w.nextNode()) list.push(w.currentNode); list.forEach(trNode); }
-if(LANG==='rny'){ trTree(document.body); new MutationObserver(muts=>{ muts.forEach(m=>{ if(m.type==='characterData') trNode(m.target); else m.addedNodes.forEach(trTree); }); }).observe(document.body,{childList:true,subtree:true,characterData:true}); }
+const trObs=new MutationObserver(muts=>{ muts.forEach(m=>{ if(m.type==='characterData') trNode(m.target); else m.addedNodes.forEach(trTree); }); });
+function trStart(){ trTree(document.body); trObs.observe(document.body,{childList:true,subtree:true,characterData:true}); }
+function trStop(){ trObs.disconnect(); trOrig.forEach((o,n)=>{ if(n.isConnected) n.nodeValue=o; }); trOrig.clear(); }
+function markLang(){ document.querySelectorAll('.langBtn').forEach(b=>b.classList.toggle('active',b.dataset.lang===LANG)); }
+window.setLang=(l)=>{ if(l!=='en' && l!=='rny') return; if(l!==LANG){ trStop(); LANG=l; try{ localStorage.setItem('ekLang',l); }catch(e){} if(LANG==='rny') trStart(); } markLang(); };
+if(LANG==='rny') trStart(); markLang();
 try {
 const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
 const { getDatabase, ref, set, onValue, runTransaction } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
@@ -407,8 +418,8 @@ window.render=()=>{
   let fb=document.getElementById('finesBox'); if(fb) fb.innerHTML=`<b>Total Fines:</b> ${fmt(fines)}<br>Collected Without Fines: <b>${fmt(withoutFines)}</b><br><b>Grand Total = ${fmt(grand)}</b><br>Net Cash = Grand ${fmt(grand)} - Loans ${fmt(loansOut)} - Expenses ${fmt(expTotal)} = <b>${fmt(cash)}</b>`;
   if(currentIsMember){
     document.getElementById('membersTitle').innerText=`Members`;
-    let h=`<table><tr><th>#</th><th>Member</th></tr>`;
-    members.forEach((m,idx)=>{ h+=`<tr><td>${idx+1}</td><td>${avatarTap(m,idx)}<b>${m.name}</b></td></tr>`; });
+    let h=`<table><tr><th>#</th><th>Member</th><th>Shares</th></tr>`;
+    members.forEach((m,idx)=>{ h+=`<tr><td>${idx+1}</td><td>${avatarTap(m,idx)}<b>${m.name}</b></td><td>${sharesCount(m)} (${fmt(m.reserved)})</td></tr>`; });
     h+=`</table>`;
     document.getElementById('memberTable').innerHTML=h;
   } else {
